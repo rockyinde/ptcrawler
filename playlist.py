@@ -13,22 +13,6 @@ DEVELOPER_KEY = "AIzaSyCKfhAgUThXhv7r6k0XKCyk3r3ckO9-7G4"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
-def get_uploads_playlist_id():
-  # Retrieve the contentDetails part of the channel resource for the
-  # authenticated user's channel.
-  channels_response = youtube.channels().list(
-    id='UC_x5XG1OV2P6uZZ5FSM9Ttw' if len(sys.argv) < 2 else sys.argv[1],
-    #id=UCYSr1LyiArqdc_z9nJoCHXw
-    part='contentDetails'
-  ).execute()
-
-  for channel in channels_response['items']:
-    # From the API response, extract the playlist ID that identifies the list
-    # of videos uploaded to the authenticated user's channel.
-    return channel['contentDetails']['relatedPlaylists']['uploads']
-
-  return None
-
 def list_uploaded_videos(uploads_playlist_id):
   # Retrieve the list of videos uploaded to the authenticated user's channel.
   playlistitems_list_request = youtube.playlistItems().list(
@@ -48,7 +32,7 @@ def list_uploaded_videos(uploads_playlist_id):
       title = playlist_item['snippet']['title']
       video_id = playlist_item['snippet']['resourceId']['videoId']
       print '%s (%s)' % (title, video_id)
-      print playlist_item
+      #print playlist_item
 
     playlistitems_list_request = youtube.playlistItems().list_next(
       playlistitems_list_request, playlistitems_list_response)
@@ -57,9 +41,9 @@ if __name__ == '__main__':
   youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
   try:
-    uploads_playlist_id = get_uploads_playlist_id()
-    if uploads_playlist_id:
-      list_uploaded_videos(uploads_playlist_id)
+    playlist_id = sys.argv[1]
+    if playlist_id:
+      list_uploaded_videos(playlist_id)
     else:
       print('There is no uploaded videos playlist for this user.')
   except HttpError, e:
