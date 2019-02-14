@@ -1,27 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
+import json
 from service import *
+import isodate
+import datetime
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-def videos_list_multiple_ids(client, **kwargs):
-  # See full sample for function
-  kwargs = remove_empty_kwargs(**kwargs)
+def video_details(client, vid_id):
 
   response = client.videos().list(
-    **kwargs
+    fields='items(id, snippet/defaultAudioLanguage, snippet/defaultLanguage, snippet/publishedAt, snippet/title, snippet/channelId, snippet/channelTitle, snippet/thumbnails, contentDetails/duration, statistics)',
+    part='snippet,contentDetails,statistics',
+    id= vid_id if len(sys.argv) < 2 else sys.argv[1]
   ).execute()
 
-  return print_response(response)
-
+  return response
 
 if __name__ == '__main__':
   client = get_service()
-  
-  videos_list_multiple_ids(client,
-    fields='items(id, snippet/defaultAudioLanguage, snippet/defaultLanguage, snippet/publishedAt, snippet/title, snippet/channelId, snippet/channelTitle, contentDetails/duration)',
-    part='snippet,contentDetails,statistics',
-    id='Ks-_Mh1QhMc,c0KYU2j0TM4,eIho2S0ZahI')
-  
+  print video_details(client, 'XbuJ9dxy7qY')
