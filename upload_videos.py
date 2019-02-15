@@ -12,6 +12,8 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from rest import saveVideo
+
 def getDurationInSecs(time):
   duration = isodate.parse_duration(time)
   return int(duration.total_seconds())
@@ -60,6 +62,7 @@ def process(client, line):
   item = details['items'][0]
   likes = int(item['statistics']['likeCount'])
   dislikes = int(item['statistics']['dislikeCount'])
+  title = item['snippet']['title']
 
   # start building video
   video['channel'] = {}
@@ -90,7 +93,12 @@ def process(client, line):
   video['thumbsUpPercentageStr'] = getLikePercentStr(likes,dislikes)
   video['title'] = item['snippet']['title']
 
-  print json.dumps(video)
+  # stringify
+  body = json.dumps(video)
+
+  # upload the video
+  print 'uploading %s\n' % (vid_id)
+  saveVideo(cat,vid_id,title,body)
 
 def run():
 
