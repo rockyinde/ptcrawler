@@ -66,6 +66,27 @@ def playlists_list_by_channel_id(client):
           print '*****************now printing playlist*****************'
           list_playlist_videos(playlist['id'])
 
+def getCat(title):
+  if 'comedy' in title.lower():
+    return 'c'
+
+  # parse year
+  year = parseYear(title)
+
+  if year:
+    if year < 1980:
+      return 'o'
+    elif year < 2000:
+      return 'p'
+    elif year < 2019:
+      return 'r'
+  else:
+    return None
+
+'''
+crawls the list of videos in the playlist
+and enumerates suitable matches
+'''
 def list_playlist_videos(playlist_id):
   # Retrieve the list of videos uploaded to the authenticated user's channel.
   playlistitems_list_request = youtube.playlistItems().list(
@@ -87,8 +108,8 @@ def list_playlist_videos(playlist_id):
         continue
       video_id = playlist_item['snippet']['resourceId']['videoId']
       print '%s (%s)' % (title, video_id)
-      vids_file.write('%s %s \n' % (video_id, title))
-      #print playlist_item
+      cat = getCat(title)
+      vids_file.write('%s %s %s \n' % (cat, video_id, title))
 
     playlistitems_list_request = youtube.playlistItems().list_next(
       playlistitems_list_request, playlistitems_list_response)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from dateutil.parser import parse
 
 from googleapiclient.discovery import build
 
@@ -28,4 +29,10 @@ def print_playlists (response):
 
   for playlist in response['items']:
       print '%s' % (playlist['snippet']['title'])
+
+def parseYear (text):
+  try:
+    return parse(text, fuzzy=True).year
+  except ValueError, e:
+    return None
 
