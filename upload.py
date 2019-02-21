@@ -60,8 +60,9 @@ def process(client, line):
   details=video_details(client,vid_id)
 
   item = details['items'][0]
-  likes = int(item['statistics']['likeCount'])
-  dislikes = int(item['statistics']['dislikeCount'])
+  # statistics n/a for all videos
+  likes = int(item['statistics']['likeCount']) if 'likeCount' in item['statistics'] else 80 
+  dislikes = int(item['statistics']['dislikeCount']) if 'dislikeCount' in item['statistics'] else 20
   title = item['snippet']['title']
 
   # start building video

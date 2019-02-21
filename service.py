@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import isodate
+
 from dateutil.parser import parse
 
 from googleapiclient.discovery import build
@@ -36,3 +38,6 @@ def parseYear (text):
   except ValueError, e:
     return None
 
+def getDurationInSecs(time):
+  duration = isodate.parse_duration(time)
+  return int(duration.total_seconds())

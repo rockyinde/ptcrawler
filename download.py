@@ -17,7 +17,7 @@ YOUTUBE_API_VERSION = "v3"
 # etvcinema = UC3Dvbf4eEov7YORy5nEioTA
 # mallemalatv = UCULLmfWqhMOeiWEV6hkMSCg
 
-playlist_filter_negative = ["song","promo","scene","show","launch","serial","event","live","private"]
+playlist_filter_negative = ["song","promo","scene","show","launch","serial","event","live","private","part","update"]
 playlist_filter_positive = ["full movie"]
 
 vids_file = open('/tmp/videos','w')
@@ -30,6 +30,17 @@ def filter (text):
     for pos in playlist_filter_positive:
         if pos in text.lower():
             return True
+    for neg in playlist_filter_negative:
+        if neg in text.lower():
+            return False
+
+    return True
+
+'''
+filter whether or not to pass a title
+for further processing
+'''
+def filterTitle (text):
     for neg in playlist_filter_negative:
         if neg in text.lower():
             return False
@@ -81,7 +92,21 @@ def getCat(title):
     elif year < 2019:
       return 'r'
   else:
-    return None
+    return 'p'
+
+def video_duration(client, vid_id):
+
+  response = client.videos().list(
+    fields='items(contentDetails/duration)',
+    part='contentDetails',
+    id=vid_id
+  ).execute()
+
+  return getDurationInSecs(response['items'][0]['contentDetails']['duration'])
+
+def is_movie_duration(client, vid_id):
+  duration = video_duration(client, vid_id)
+  return duration > 5400  # 1.5 HOUR
 
 '''
 crawls the list of videos in the playlist
@@ -104,12 +129,14 @@ def list_playlist_videos(playlist_id):
     # Print information about each video.
     for playlist_item in playlistitems_list_response['items']:
       title = playlist_item['snippet']['title']
-      if not filter(title):
+      if not filterTitle(title):
         continue
       video_id = playlist_item['snippet']['resourceId']['videoId']
+      if not is_movie_duration(youtube, video_id):
+        continue
       print '%s (%s)' % (title, video_id)
       cat = getCat(title)
-      vids_file.write('%s %s %s \n' % (cat, video_id, title))
+      vids_file.write('%s %s %s \n' % (cat, video_id, title.encode('ascii', 'ignore').decode('ascii')))
 
     playlistitems_list_request = youtube.playlistItems().list_next(
       playlistitems_list_request, playlistitems_list_response)
