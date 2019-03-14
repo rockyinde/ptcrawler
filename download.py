@@ -17,8 +17,8 @@ YOUTUBE_API_VERSION = "v3"
 # etvcinema = UC3Dvbf4eEov7YORy5nEioTA
 # mallemalatv = UCULLmfWqhMOeiWEV6hkMSCg
 
-playlist_filter_negative = ["song","promo","scene","show","launch","serial","event","live","private","part","update"]
-playlist_filter_positive = ["full movie"]
+playlist_filter_negative = ["song","promo","scene","show","launch","serial","event","live","private","part","update","success","celebrations","interview","gossip","news","press","media","teaser","trailer","hindi"]
+playlist_filter_positive = []
 
 vids_file = open('/tmp/videos','w')
 
@@ -77,6 +77,11 @@ def playlists_list_by_channel_id(client):
           print '*****************now printing playlist*****************'
           list_playlist_videos(playlist['id'])
 
+o_key_words = ["anr", "shobhan babu", "savitri", "ntr"]
+c_key_words = ["allari naresh","rajendra prasad","comedy"]
+p_key_words = ["balakrishna"]
+r_key_words = ["latest"]
+
 def getCat(title):
   if 'comedy' in title.lower():
     return 'c'
@@ -92,7 +97,7 @@ def getCat(title):
     elif year < 2019:
       return 'r'
   else:
-    return 'p'
+    return 'n'
 
 def video_duration(client, vid_id):
 
@@ -102,7 +107,12 @@ def video_duration(client, vid_id):
     id=vid_id
   ).execute()
 
-  return getDurationInSecs(response['items'][0]['contentDetails']['duration'])
+  try:
+    secs = getDurationInSecs(response['items'][0]['contentDetails']['duration'])
+  except:
+    secs = 0
+
+  return secs
 
 def is_movie_duration(client, vid_id):
   duration = video_duration(client, vid_id)
@@ -131,6 +141,7 @@ def list_playlist_videos(playlist_id):
       title = playlist_item['snippet']['title']
       if not filterTitle(title):
         continue
+      time.sleep(1)
       video_id = playlist_item['snippet']['resourceId']['videoId']
       if not is_movie_duration(youtube, video_id):
         continue

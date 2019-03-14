@@ -13,7 +13,7 @@ from googleapiclient.errors import HttpError
 def video_details(client, vid_id):
 
   response = client.videos().list(
-    fields='items(id, snippet/defaultAudioLanguage, snippet/defaultLanguage, snippet/publishedAt, snippet/title, snippet/channelId, snippet/channelTitle, snippet/thumbnails, contentDetails/endAt, statistics)',
+    fields='items(id, snippet/defaultAudioLanguage, snippet/defaultLanguage, snippet/publishedAt, snippet/title, snippet/channelId, snippet/channelTitle, snippet/thumbnails, statistics)',
     part='snippet,contentDetails,statistics',
     id= vid_id if len(sys.argv) < 2 else sys.argv[1]
   ).execute()

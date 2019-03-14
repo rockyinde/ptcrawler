@@ -42,10 +42,10 @@ def video_details(client, vid_id):
   return response
 
 def getLikePercent(likes,dislikes):
-  return likes*100/(likes+dislikes)
+  return (likes*100)/(likes+dislikes) if likes > 0 else 80
 
 def getLikePercentStr(likes,dislikes):
-  return str(likes*100/(likes+dislikes)) + '%'
+  return str(getLikePercent(likes,dislikes)) + '%'
 
 '''
 process 1 line from the videos file
