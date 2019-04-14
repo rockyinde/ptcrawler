@@ -20,7 +20,7 @@ YOUTUBE_API_VERSION = "v3"
 playlist_filter_negative = ["song","promo","scene","show","launch","serial","event","live","private","part","update","success","celebrations","interview","gossip","news","press","media","teaser","trailer","hindi"]
 playlist_filter_positive = []
 
-vids_file = open('/tmp/videos','w')
+vids_file = open('/home/akshar/Documents/47mm/videos','w')
 
 '''
 filter whether or not to pass a playlist 
@@ -92,7 +92,7 @@ def getCat(title):
   if year:
     if year < 1980:
       return 'o'
-    elif year < 2000:
+    elif year < 2005:
       return 'p'
     elif year < 2019:
       return 'r'

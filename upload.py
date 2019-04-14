@@ -105,7 +105,7 @@ def run():
 
   client = get_service()
 
-  vid_file = open('/tmp/videos','r')
+  vid_file = open('/home/akshar/Documents/47mm/videos.uniq','r')
 
   line = vid_file.readline()
   while line:

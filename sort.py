@@ -1,4 +1,4 @@
 import os
 
-cmd = 'sort /tmp/videos | uniq > /tmp/videos.uniq'
+cmd = 'sort /home/akshar/Documents/47mm/videos | uniq > /home/akshar/Documents/47mm/videos.uniq'
 os.system(cmd)
