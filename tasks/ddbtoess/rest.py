@@ -17,11 +17,14 @@ def saveVideo (cat,vid,title,body):
 def fetchVideo (cat,pt):
   payload = {}
   payload['c'] = cat
-  payload['pt'] = pt
+  if pt is not None:
+    payload['pt'] = pt
   response = requests.post(fetch_url, data=json.dumps(payload))
-  return response
+  return json.loads(response.content)
 
 def postVideoToESS (video):
   # use the same ID of YT as ESS index document ID
-  response = requests.post(ess_url+'/'+video['id'], data=json.dumps(video))
+  headers = {'content-type': 'application/json'}
+  response = requests.post(ess_url+'/'+video['id'], data=json.dumps(video),
+                            headers = headers)
   return response
