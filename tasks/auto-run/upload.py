@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# needs to do two things now:
-# upload to DDB & update ESS
 
 import os
 import json
@@ -15,7 +13,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from rest import saveVideo
-from rest import saveVideoToESS
 
 def getDurationInSecs(time):
   duration = isodate.parse_duration(time)
@@ -60,7 +57,10 @@ def process(client, line):
   cat = 'n'
   vid_id = tokens[0]
 
-  details=video_details(client,vid_id)
+  try:
+    details=video_details(client,vid_id)
+  except:
+    print 'error'
 
   item = details['items'][0]
   # statistics n/a for all videos
@@ -101,11 +101,8 @@ def process(client, line):
   body = json.dumps(video)
 
   # upload the video
-  print 'uploading %s to DDB\n' % (vid_id)
+  print 'uploading %s\n' % (vid_id)
   saveVideo(cat,vid_id,title,body)
-
-  print 'uploading %s to ESS\n' % (vid_id)
-  saveVideoToESS(cat,vid_id,title,body)
 
 def run():
 

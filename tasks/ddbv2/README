@@ -1,0 +1,5 @@
+This script 'start.py' scans the entire database (DynamoDB) 'videos' table iteratively, indexing the document with Elastic search service in each iteration.
+
+It scans one category at a time.
+
+Elasticsearch service index API replaces & reindexes the same document (i.e., same ID), hence this activity is idempotent.

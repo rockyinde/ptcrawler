@@ -11,6 +11,13 @@ from oauth2client.tools import argparser
 
 from service import *
 
+# parsing datetime
+import isodate
+import dateutil.parser
+import datetime
+import calendar
+import pytz
+
 DEVELOPER_KEY = "AIzaSyCKfhAgUThXhv7r6k0XKCyk3r3ckO9-7G4"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
@@ -21,6 +28,12 @@ playlist_filter_negative = ["song","promo","scene","show","launch","serial","eve
 playlist_filter_positive = []
 
 vids_file = open('/home/akshar/Documents/47mm/videos','w')
+
+# utility functions for parsing datetime
+def is_newly_added(timestamp):
+  dt = dateutil.parser.parse(timestamp)
+  now = pytz.utc.localize(datetime.datetime.now())
+  return (now - dt).days < 90   # last 3 months
 
 '''
 filter whether or not to pass a playlist 
@@ -82,42 +95,22 @@ c_key_words = ["allari naresh","rajendra prasad","comedy"]
 p_key_words = ["balakrishna"]
 r_key_words = ["latest"]
 
-def getCat(title):
-  if 'comedy' in title.lower():
-    return 'c'
-
-  # parse year
-  year = parseYear(title)
-
-  if year:
-    if year < 1980:
-      return 'o'
-    elif year < 2005:
-      return 'p'
-    elif year < 2019:
-      return 'r'
-  else:
-    return 'n'
-
-def video_duration(client, vid_id):
+def is_movie_duration_and_newly_added(client, vid_id):
 
   response = client.videos().list(
-    fields='items(contentDetails/duration)',
-    part='contentDetails',
+    fields='items(snippet/publishedAt, contentDetails/duration)',
+    part='snippet,contentDetails',
     id=vid_id
   ).execute()
 
   try:
     secs = getDurationInSecs(response['items'][0]['contentDetails']['duration'])
+    pub_date = response['items'][0]['snippet']['publishedAt']
   except:
-    print 'error'
     secs = 0
+    pub_date = 0
 
-  return secs
-
-def is_movie_duration(client, vid_id):
-  duration = video_duration(client, vid_id)
-  return duration > 5400  # 1.5 HOUR
+  return secs > 5400 and is_newly_added(pub_date)  # 1.5 HOUR
 
 '''
 crawls the list of videos in the playlist
@@ -144,11 +137,10 @@ def list_playlist_videos(playlist_id):
         continue
       time.sleep(1)
       video_id = playlist_item['snippet']['resourceId']['videoId']
-      if not is_movie_duration(youtube, video_id):
+      if not is_movie_duration_and_newly_added(youtube, video_id):
         continue
+      print 'found a newly added'
       print '%s (%s)' % (title, video_id)
-      #cat = getCat(title)
-      #vids_file.write('%s %s %s \n' % (cat, video_id, title.encode('ascii', 'ignore').decode('ascii')))
       vids_file.write('%s %s \n' % (video_id, title.encode('ascii', 'ignore').decode('ascii')))
 
     playlistitems_list_request = youtube.playlistItems().list_next(
