@@ -23,6 +23,7 @@ def scan():
 
       print 'Processing response with video count: %s\n' % (count)
       for i in range(count):
+        saveVideoV2 (vid,cat,title,likes,views,perc,pdate,tags,body
         r = postVideoToESS(items[i])
         print 'response from ESS: %s\n' % (r.content)
 
