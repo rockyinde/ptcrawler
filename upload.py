@@ -15,6 +15,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from rest import saveVideo
+from rest import saveVideoV2
 from rest import saveVideoToESS
 
 def getDurationInSecs(time):
@@ -98,11 +99,13 @@ def process(client, line):
   video['title'] = item['snippet']['title']
 
   # stringify
-  body = json.dumps(video)
+  #body = json.dumps(video) # v1
+  body = video  # v2
 
   # upload the video
   print 'uploading %s to DDB\n' % (vid_id)
-  saveVideo(cat,vid_id,title,body)
+  #saveVideo(cat,vid_id,title,body)
+  saveVideoV2 (vid_id,cat,title,body['likeCount'],body['viewsCountInt'],body['thumbsUpPercentage'],body['publishDate']['value'],"{}",body)
 
   print 'uploading %s to ESS\n' % (vid_id)
   saveVideoToESS(cat,vid_id,title,body)
@@ -111,7 +114,7 @@ def run():
 
   client = get_service()
 
-  vid_file = open('/home/akshar/Documents/47mm/videos.uniq','r')
+  vid_file = open('/home/akshar/Documents/47mm/videos.v2','r')
 
   line = vid_file.readline()
   while line:
