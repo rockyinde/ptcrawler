@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# needs to do two things now:
+# upload to DDB & update ESS
 
 import os
 import json
@@ -13,6 +15,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from rest import saveVideo
+from rest import saveVideoV2
+from rest import saveVideoToESS
 
 def getDurationInSecs(time):
   duration = isodate.parse_duration(time)
@@ -57,10 +61,7 @@ def process(client, line):
   cat = 'n'
   vid_id = tokens[0]
 
-  try:
-    details=video_details(client,vid_id)
-  except:
-    print 'error'
+  details=video_details(client,vid_id)
 
   item = details['items'][0]
   # statistics n/a for all videos
@@ -98,17 +99,21 @@ def process(client, line):
   video['title'] = item['snippet']['title']
 
   # stringify
-  body = json.dumps(video)
+  body_v1 = json.dumps(video) # v1
+  body = video  # v2
 
   # upload the video
-  print 'uploading %s\n' % (vid_id)
-  saveVideo(cat,vid_id,title,body)
+  print 'uploading %s to DDB\n' % (vid_id)
+  saveVideoV2 (vid_id,cat,title,body['likeCount'],body['viewsCountInt'],body['thumbsUpPercentage'],body['publishDate']['value'],"{}",body)
+
+  print 'uploading %s to ESS\n' % (vid_id)
+  saveVideoToESS(cat,vid_id,title,body_v1)
 
 def run():
 
   client = get_service()
 
-  vid_file = open('/home/akshar/Documents/47mm/videos.uniq','r')
+  vid_file = open('/home/akshar/Documents/47mm/videos','r')
 
   line = vid_file.readline()
   while line:

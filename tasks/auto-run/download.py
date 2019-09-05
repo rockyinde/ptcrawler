@@ -33,7 +33,7 @@ vids_file = open('/home/akshar/Documents/47mm/videos','w')
 def is_newly_added(timestamp):
   dt = dateutil.parser.parse(timestamp)
   now = pytz.utc.localize(datetime.datetime.now())
-  return (now - dt).days < 90   # last 3 months
+  return (now - dt).days < 60   # last 3 months
 
 '''
 filter whether or not to pass a playlist 
